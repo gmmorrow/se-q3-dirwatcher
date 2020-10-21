@@ -39,8 +39,6 @@ def search_for_magic(ns):
 
 def watch_directory(ns):
     file_dict = {}
-    # while not exit_flag:
-    # time.sleep(interval)
     try:
         if os.path.isdir(ns.dir):
             directories = os.listdir(os.path.abspath(ns.dir))
@@ -85,13 +83,29 @@ def create_parser():
 
 
 def signal_handler(sig_num, frame):
-    # Your code here
+    global stay_runnung
+    stay_runnung = False
     return
 
 
 def main(args):
-    # Your code here
-    return
+    parser = create_parser()
+    ns = parser.parse_args(args)
+    if not ns:
+        parser.print_usage()
+        sys.exit(1)
+
+    signal.signal(signal.SIGINT, signal_handler)
+    signal.signal(signal.SIGTERM, signal_handler)
+    while not stay_runnung:
+        try:
+            # call my directory watching function
+            watch_directory(ns)
+            time.sleep(1.0)
+        except Exception as e:
+            # This is an UNHANDLED exception
+            # Log an ERROR level message here
+            logger.exception(e)
 
 
 if __name__ == '__main__':
