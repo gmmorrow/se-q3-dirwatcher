@@ -16,6 +16,9 @@ import signal
 
 main_dict = {}
 logger = logging.getLogger(__name__)
+exit_flag = False
+formatter = logging.Formatter('%(asctime)s:%(name)s:%(message)s')
+
 
 def search_for_magic(ns):
     try:
@@ -91,13 +94,15 @@ def signal_handler(sig_num, frame):
 def main(args):
     parser = create_parser()
     ns = parser.parse_args(args)
+    
     if not ns:
         parser.print_usage()
         sys.exit(1)
-
+    
     signal.signal(signal.SIGINT, signal_handler)
     signal.signal(signal.SIGTERM, signal_handler)
-    while not stay_runnung:
+    
+    while not exit_flag:
         try:
             # call my directory watching function
             watch_directory(ns)
