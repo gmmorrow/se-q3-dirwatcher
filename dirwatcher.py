@@ -28,23 +28,60 @@ def search_for_magic(ns):
                             main_dict[file].append(index)
                             logger.info(
                                 "The magic word, " +
-                                ns.magicword.upper() + " was found on line "
+                                ns.magicword.upper() + " can be found on line "
                                 + str(index + 1) + " in " + file)
                         if ns.magicword not in line:
                             logger.info(
                                 "The magic word, " +
-                                ns.magicword.upper() + " is not found")
+                                ns.magicword.upper() + " cannot be found")
     except Exception as e:
         logger.info(e)
 
-def watch_directory(path, magic_string, extension, interval):
-    # Your code here
-    return
+def watch_directory(ns):
+    file_dict = {}
+    # while not exit_flag:
+    # time.sleep(interval)
+    try:
+        if os.path.isdir(ns.dir):
+            directories = os.listdir(os.path.abspath(ns.dir))
+            for files in directories:
+                if files.endswith(ns.file):
+                    file_dict.setdefault(files, [])
+        else:
+            logger.info('No directory found')
+    except Exception as e:
+        logger.info(e)
+    detect_dir_changes(file_dict, ns)
+
+
+def detect_dir_changes(file_dict, ns):
+        try:
+            for files in file_dict:
+                if files not in main_dict:
+                    logger.info(files + " has been added to " + ns.dir)
+                    main_dict[files] = []
+            for files in main_dict:
+                if files not in file_dict:
+                    logger.info(files + " has been removed from " + ns.dir)
+                    del main_dict[files]
+        except Exception as e:
+            logger.info(e)
+        search_for_magic(ns)
 
 
 def create_parser():
-    # Your code here
-    return
+    parser = argparse.ArgumentParser(
+        description="Watch for a word to be added.")
+    parser.add_argument(
+        '-e', help='extension of searching file name')
+    parser.add_argument(
+        '-i', help='polling interval program')
+    parser.add_argument(
+        'magic', help='summary file that magic text can be found')
+    parser.add_argument(
+        'path', help='Director to search')
+    parser.add_argument('files', help='filename(s) to parse')
+    return parser
 
 
 def signal_handler(sig_num, frame):
@@ -55,27 +92,6 @@ def signal_handler(sig_num, frame):
 def main(args):
     # Your code here
     return
-
-
-
-
-# def create_parser():
-#     """Create a command line parser object with 2 argument definitions."""
-#     parser = argparse.ArgumentParser(
-#         description="Extracts and alphabetizes baby names from html.")
-#     parser.add_argument(
-#         '-e', help='extension of searching file name')
-#     parser.add_argument(
-#         '-i', help='polling interval program')
-#     parser.add_argument(
-#         'magic', help='summary file that magic text can be found')
-#     parser.add_argument(
-#         'path', help='Director to search')
-#     parser.add_argument('files', help='filename(s) to parse')
-#     return parser
-
-
-
 
 
 if __name__ == '__main__':
